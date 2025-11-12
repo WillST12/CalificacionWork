@@ -19,6 +19,6 @@ namespace Backend.API.Models
         public int IdAlumno { get; set; }
         public Alumno Alumno { get; set; }
 
-        public ICollection<Calificacion> Calificaciones { get; set; }
+        public ICollection<Calificaciones> Calificaciones { get; set; }
     }
 }

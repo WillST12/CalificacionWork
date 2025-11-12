@@ -4,6 +4,7 @@ using Backend.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Calificacionesp2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251112130135_ProfesorMateriaFix")]
+    partial class ProfesorMateriaFix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -67,7 +70,7 @@ namespace Calificacionesp2.Migrations
                     b.ToTable("Alumnos");
                 });
 
-            modelBuilder.Entity("Backend.API.Models.Calificaciones", b =>
+            modelBuilder.Entity("Backend.API.Models.Calificacion", b =>
                 {
                     b.Property<int>("IdCalificacion")
                         .ValueGeneratedOnAdd()
@@ -103,7 +106,10 @@ namespace Calificacionesp2.Migrations
                     b.Property<bool>("Activo")
                         .HasColumnType("bit");
 
-                    b.Property<int>("IdProfesorMateria")
+                    b.Property<int>("IdMateria")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdProfesor")
                         .HasColumnType("int");
 
                     b.Property<string>("Periodo")
@@ -111,14 +117,11 @@ namespace Calificacionesp2.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<int?>("ProfesorIdProfesor")
-                        .HasColumnType("int");
-
                     b.HasKey("IdClase");
 
-                    b.HasIndex("IdProfesorMateria");
+                    b.HasIndex("IdMateria");
 
-                    b.HasIndex("ProfesorIdProfesor");
+                    b.HasIndex("IdProfesor");
 
                     b.ToTable("Clases");
                 });
@@ -221,11 +224,11 @@ namespace Calificacionesp2.Migrations
 
             modelBuilder.Entity("Backend.API.Models.ProfesorMateria", b =>
                 {
-                    b.Property<int>("IdProfesorMateria")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdProfesorMateria"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("IdMateria")
                         .HasColumnType("int");
@@ -233,7 +236,7 @@ namespace Calificacionesp2.Migrations
                     b.Property<int>("IdProfesor")
                         .HasColumnType("int");
 
-                    b.HasKey("IdProfesorMateria");
+                    b.HasKey("Id");
 
                     b.HasIndex("IdMateria");
 
@@ -318,7 +321,7 @@ namespace Calificacionesp2.Migrations
                     b.Navigation("Usuario");
                 });
 
-            modelBuilder.Entity("Backend.API.Models.Calificaciones", b =>
+            modelBuilder.Entity("Backend.API.Models.Calificacion", b =>
                 {
                     b.HasOne("Backend.API.Models.ClaseAlumno", "ClaseAlumno")
                         .WithMany("Calificaciones")
@@ -331,17 +334,21 @@ namespace Calificacionesp2.Migrations
 
             modelBuilder.Entity("Backend.API.Models.Clase", b =>
                 {
-                    b.HasOne("Backend.API.Models.ProfesorMateria", "ProfesorMateria")
+                    b.HasOne("Backend.API.Models.Materia", "Materia")
                         .WithMany()
-                        .HasForeignKey("IdProfesorMateria")
+                        .HasForeignKey("IdMateria")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Backend.API.Models.Profesor", null)
+                    b.HasOne("Backend.API.Models.Profesor", "Profesor")
                         .WithMany("Clases")
-                        .HasForeignKey("ProfesorIdProfesor");
+                        .HasForeignKey("IdProfesor")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.Navigation("ProfesorMateria");
+                    b.Navigation("Materia");
+
+                    b.Navigation("Profesor");
                 });
 
             modelBuilder.Entity("Backend.API.Models.ClaseAlumno", b =>

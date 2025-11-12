@@ -8,12 +8,8 @@ namespace Backend.API.Models
         public int IdClase { get; set; }
 
         [Required]
-        public int IdProfesor { get; set; }
-        public Profesor Profesor { get; set; }
-
-        [Required]
-        public int IdMateria { get; set; }
-        public Materia Materia { get; set; }
+        public int IdProfesorMateria { get; set; }
+        public ProfesorMateria ProfesorMateria { get; set; }
 
         [Required, MaxLength(20)]
         public string Periodo { get; set; }

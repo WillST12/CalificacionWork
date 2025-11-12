@@ -18,43 +18,70 @@ namespace Backend.API.Controllers
             _context = context;
         }
 
+        // ✅ Crear clase
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CrearClase([FromBody] ClaseDTO dto)
         {
+            var profesorMateria = await _context.ProfesorMaterias
+                .Include(pm => pm.Profesor)
+                .Include(pm => pm.Materia)
+                .FirstOrDefaultAsync(pm => pm.IdProfesorMateria == dto.IdProfesorMateria);
+
+            if (profesorMateria == null)
+                return BadRequest("La relación Profesor-Materia no existe.");
+
             var clase = new Clase
             {
-                IdMateria = dto.IdMateria,
-                IdProfesor = dto.IdProfesor,
+                IdProfesorMateria = dto.IdProfesorMateria,
                 Periodo = dto.Periodo,
-                Activo = true
+                Activo = dto.Activo
             };
 
             _context.Clases.Add(clase);
             await _context.SaveChangesAsync();
-            return Ok("Clase creada correctamente.");
+
+            return Ok($"Clase creada para {profesorMateria.Materia.Nombre} con el profesor {profesorMateria.Profesor.Nombre}.");
         }
 
+        // ✅ Obtener todas las clases
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Profesor,Alumno")]
         public async Task<IActionResult> GetClases()
         {
             var clases = await _context.Clases
-                .Include(c => c.Materia)
-                .Include(c => c.Profesor)
+                .Include(c => c.ProfesorMateria)
+                    .ThenInclude(pm => pm.Profesor)
+                .Include(c => c.ProfesorMateria.Materia)
+                .Select(c => new
+                {
+                    c.IdClase,
+                    c.Periodo,
+                    c.Activo,
+                    Profesor = c.ProfesorMateria.Profesor.Nombre + " " + c.ProfesorMateria.Profesor.Apellido,
+                    Materia = c.ProfesorMateria.Materia.Nombre
+                })
                 .ToListAsync();
+
             return Ok(clases);
         }
 
+        // ✅ Editar clase
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> EditarClase(int id, [FromBody] ClaseDTO dto)
         {
             var clase = await _context.Clases.FindAsync(id);
-            if (clase == null) return NotFound();
+            if (clase == null)
+                return NotFound("Clase no encontrada.");
 
-            clase.IdProfesor = dto.IdProfesor;
-            clase.IdMateria = dto.IdMateria;
+            var profesorMateria = await _context.ProfesorMaterias
+                .FirstOrDefaultAsync(pm => pm.IdProfesorMateria == dto.IdProfesorMateria);
+
+            if (profesorMateria == null)
+                return BadRequest("Relación Profesor-Materia inválida.");
+
+            clase.IdProfesorMateria = dto.IdProfesorMateria;
             clase.Periodo = dto.Periodo;
             clase.Activo = dto.Activo;
 
@@ -62,18 +89,19 @@ namespace Backend.API.Controllers
             return Ok("Clase actualizada correctamente.");
         }
 
+        // ✅ Eliminar clase
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> EliminarClase(int id)
         {
             var clase = await _context.Clases.FindAsync(id);
-            if (clase == null) return NotFound();
+            if (clase == null)
+                return NotFound("Clase no encontrada.");
 
             _context.Clases.Remove(clase);
             await _context.SaveChangesAsync();
 
             return Ok("Clase eliminada correctamente.");
         }
-
     }
 }

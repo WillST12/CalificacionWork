@@ -551,6 +551,48 @@
         }
       }
     },
+    "/api/Profesores/{id}": {
+      "put": {
+        "tags": [
+          "Profesores"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfesorDTO"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfesorDTO"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfesorDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Profesores/desactivar/{id}": {
       "put": {
         "tags": [
@@ -559,6 +601,89 @@
         "parameters": [
           {
             "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/ProfesorMaterias": {
+      "post": {
+        "tags": [
+          "ProfesorMaterias"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfesorMateriaDTO"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfesorMateriaDTO"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfesorMateriaDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "ProfesorMaterias"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfesorMateriaDTO"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfesorMateriaDTO"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfesorMateriaDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/ProfesorMaterias/profesor/{idProfesor}": {
+      "get": {
+        "tags": [
+          "ProfesorMaterias"
+        ],
+        "parameters": [
+          {
+            "name": "idProfesor",
             "in": "path",
             "required": true,
             "schema": {
@@ -663,11 +788,7 @@
       "ClaseDTO": {
         "type": "object",
         "properties": {
-          "idMateria": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "idProfesor": {
+          "idProfesorMateria": {
             "type": "integer",
             "format": "int32"
           },
@@ -753,6 +874,20 @@
           "especialidad": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProfesorMateriaDTO": {
+        "type": "object",
+        "properties": {
+          "idProfesor": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idMateria": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false

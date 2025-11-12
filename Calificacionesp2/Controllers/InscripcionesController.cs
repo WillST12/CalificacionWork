@@ -34,8 +34,8 @@ namespace Backend.API.Controllers
 
             // Buscar la clase asociada a esa materia
             var clase = await _context.Clases
-                .Include(c => c.Materia)
-                .FirstOrDefaultAsync(c => c.IdMateria == materia.IdMateria);
+                .Include(c => c.ProfesorMateria)
+                .FirstOrDefaultAsync(c => c.ProfesorMateria.IdMateria == materia.IdMateria);
 
             if (clase == null)
                 return NotFound("No hay clases registradas para esa materia.");
@@ -74,15 +74,16 @@ namespace Backend.API.Controllers
         {
             var clases = await _context.ClaseAlumnos
                 .Include(ca => ca.Clase)
-                    .ThenInclude(c => c.Materia)
-                .Include(ca => ca.Clase.Profesor)
+                    .ThenInclude(c => c.ProfesorMateria)
+                        .ThenInclude(pm => pm.Materia)
+                .Include(ca => ca.Clase.ProfesorMateria.Profesor)
                 .Where(ca => ca.IdAlumno == idAlumno)
                 .Select(ca => new
                 {
                     ca.IdClase,
-                    Materia = ca.Clase.Materia.Nombre,
-                    CodigoMateria = ca.Clase.Materia.Codigo,
-                    Profesor = ca.Clase.Profesor.Nombre + " " + ca.Clase.Profesor.Apellido,
+                    Materia = ca.Clase.ProfesorMateria.Materia.Nombre,
+                    CodigoMateria = ca.Clase.ProfesorMateria.Materia.Codigo,
+                    Profesor = ca.Clase.ProfesorMateria.Profesor.Nombre + " " + ca.Clase.ProfesorMateria.Profesor.Apellido,
                     ca.Clase.Periodo
                 })
                 .ToListAsync();

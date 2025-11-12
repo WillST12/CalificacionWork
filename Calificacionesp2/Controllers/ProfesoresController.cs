@@ -51,6 +51,26 @@ namespace Backend.API.Controllers
             return Ok(profesores);
         }
 
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> EditarProfesor(int id, [FromBody] ProfesorDTO dto)
+        {
+            var profesor = await _context.Profesores.FindAsync(id);
+            if (profesor == null)
+                return NotFound("Profesor no encontrado.");
+
+            profesor.Nombre = dto.Nombre;
+            profesor.Apellido = dto.Apellido;
+            profesor.Correo = dto.Correo;
+            profesor.Especialidad = dto.Especialidad;
+
+            _context.Profesores.Update(profesor);
+            await _context.SaveChangesAsync();
+
+            return Ok("Profesor actualizado correctamente.");
+        }
+
+
         [HttpPut("desactivar/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DesactivarProfesor(int id)

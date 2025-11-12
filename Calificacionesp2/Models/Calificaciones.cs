@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Backend.API.Models
 {
-    public class Calificacion
+    public class Calificaciones
     {
         [Key]
         public int IdCalificacion { get; set; }
