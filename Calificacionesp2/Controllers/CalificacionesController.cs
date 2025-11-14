@@ -127,5 +127,46 @@ namespace Backend.API.Controllers
 
             return Ok(calificaciones);
         }
+        [HttpPut("{idCalificacion}")]
+        [Authorize(Roles = "Profesor,Admin")]
+        public async Task<IActionResult> EditarCalificacion(int idCalificacion, [FromBody] CalificacionDTO dto)
+        {
+            var calificacion = await _context.Calificaciones
+                .Include(c => c.ClaseAlumno)
+                    .ThenInclude(ca => ca.Clase)
+                        .ThenInclude(cl => cl.ProfesorMateria)
+                .FirstOrDefaultAsync(c => c.IdCalificacion == idCalificacion);
+
+            if (calificacion == null)
+                return NotFound("❌ La calificación no existe.");
+
+            // == VALIDAR PROFESOR ==
+            var rol = User.Claims.First(c => c.Type.EndsWith("role")).Value;
+
+            if (rol == "Profesor")
+            {
+                int idUsuario = int.Parse(User.Claims.First(c => c.Type.Contains("idUsuario")).Value);
+
+                // Buscar el profesor logueado
+                var profesor = await _context.Profesores
+                    .FirstOrDefaultAsync(p => p.IdUsuario == idUsuario);
+
+                if (profesor == null)
+                    return Unauthorized("❌ Profesor no encontrado.");
+
+                // Verificar si es su clase
+                if (calificacion.ClaseAlumno.Clase.ProfesorMateria.IdProfesor != profesor.IdProfesor)
+                    return Unauthorized("❌ No puedes editar calificaciones de clases que no impartes.");
+            }
+
+            // === EDITAR NOTA ===
+            calificacion.Nota = dto.Nota;
+            calificacion.FechaRegistro = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+
+            return Ok("✅ Calificación actualizada correctamente.");
+        }
+
     }
 }

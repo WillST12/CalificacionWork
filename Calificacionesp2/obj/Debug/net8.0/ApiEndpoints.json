@@ -128,6 +128,27 @@
   },
   {
     "ContainingType": "Backend.API.Controllers.CalificacionesController",
+    "Method": "EditarCalificacion",
+    "RelativePath": "api/Calificaciones/{idCalificacion}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idCalificacion",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "Backend.API.Models.DTOs.CalificacionDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Backend.API.Controllers.CalificacionesController",
     "Method": "GetCalificacionesAlumno",
     "RelativePath": "api/Calificaciones/alumno/{idAlumno}",
     "HttpMethod": "GET",
