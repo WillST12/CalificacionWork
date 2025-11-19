@@ -1,8 +1,23 @@
 import { createBrowserRouter } from "react-router-dom";
-import Login from "../pages/Login/Login.jsx";
-import Dashboard from "../pages/Dashboard/Dashboard.jsx";
+import Login from "../pages/login/Login";
+import Dashboard from "../pages/Dashboard/Dashboard";
+import DashboardLayout from "../components/layout/DashboardLayout";
+import RequireAuth from "../components/auth/RequireAuth";
 
 export const router = createBrowserRouter([
-  { path: "/", element: <Login /> },
-  { path: "/dashboard", element: <Dashboard /> },
+  {
+    path: "/",
+    element: <Login />,
+  },
+  {
+    path: "/dashboard",
+    element: (
+      <RequireAuth roles={["Admin", "Profesor", "Alumno"]}>
+        <DashboardLayout />
+      </RequireAuth>
+    ),
+    children: [
+      { index: true, element: <Dashboard /> },
+    ],
+  },
 ]);
