@@ -931,6 +931,10 @@
       "CambiarContrasenaDTO": {
         "type": "object",
         "properties": {
+          "nombreUsuario": {
+            "type": "string",
+            "nullable": true
+          },
           "contrasenaActual": {
             "type": "string",
             "nullable": true
