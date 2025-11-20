@@ -13,7 +13,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
-// Controllers + JSON options to avoid cycles
+
 builder.Services.AddControllers()
     .AddJsonOptions(o =>
     {
@@ -45,6 +45,17 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddCors(
+options => 
+{
+    options.AddPolicy("AllowFrontend", app =>
+    {
+        app.AllowAnyOrigin().
+        AllowAnyHeader().
+        AllowAnyMethod().WithOrigins("http://localhost:5173/");
+    });
+}    
+    );
 // JWT
 var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]);
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -62,6 +73,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 var app = builder.Build();
+
+app.UseCors("AllowFrontend");
 
 if (app.Environment.IsDevelopment())
 {

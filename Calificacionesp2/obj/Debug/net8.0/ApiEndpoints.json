@@ -80,6 +80,22 @@
   },
   {
     "ContainingType": "Backend.API.Controllers.AuthController",
+    "Method": "CambiarContrasena",
+    "RelativePath": "api/Auth/cambiar-contrasena",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "CambiarContrasenaDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Backend.API.Controllers.AuthController",
     "Method": "Login",
     "RelativePath": "api/Auth/login",
     "HttpMethod": "POST",

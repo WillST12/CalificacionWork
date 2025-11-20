@@ -24,7 +24,6 @@ namespace Backend.API.Controllers
             _config = config;
         }
 
-        // ✅ Registrar usuario (Admin, Profesor o Alumno)
         [HttpPost("register")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RegistrarUsuario([FromBody] RegistrarUsuarioDTO dto)
@@ -36,9 +35,10 @@ namespace Backend.API.Controllers
             var usuario = new Usuario
             {
                 NombreUsuario = dto.NombreUsuario,
-                ContrasenaHash = dto.Contrasena, // luego aplicamos Hash
+                ContrasenaHash = dto.Contrasena,  
                 IdRol = dto.IdRol,
-                Activo = true
+                Activo = true,
+                CambiarContrasena = true
             };
 
             _context.Usuarios.Add(usuario);
@@ -49,11 +49,14 @@ namespace Backend.API.Controllers
                 message = "Usuario registrado correctamente.",
                 usuario.IdUsuario,
                 usuario.NombreUsuario,
-                usuario.IdRol
+                usuario.IdRol,
+                usuario.CambiarContrasena
             });
         }
 
-        // ✅ Login - genera token JWT
+        // ============================================================
+        // 2. LOGIN - Retorna JWT y si debe cambiar contraseña
+        // ============================================================
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest dto)
         {
@@ -67,11 +70,12 @@ namespace Backend.API.Controllers
             if (usuario.ContrasenaHash != dto.Contrasena)
                 return Unauthorized("Contraseña incorrecta.");
 
+            // Crear JWT
             var claims = new[]
             {
-                new Claim("idUsuario", usuario.IdUsuario.ToString()),
-                new Claim(ClaimTypes.Role, usuario.Rol.Nombre)
-            };
+        new Claim("idUsuario", usuario.IdUsuario.ToString()),
+        new Claim(ClaimTypes.Role, usuario.Rol.Nombre)
+    };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -84,11 +88,38 @@ namespace Backend.API.Controllers
                 signingCredentials: creds
             );
 
+            // SIEMPRE DEVOLVEMOS TOKEN
             return Ok(new
             {
                 token = new JwtSecurityTokenHandler().WriteToken(token),
-                rol = usuario.Rol.Nombre
+                rol = usuario.Rol.Nombre,
+                debeCambiarContrasena = usuario.CambiarContrasena
             });
+        }
+
+
+
+        [HttpPost("cambiar-contrasena")]
+        [Authorize]
+        public async Task<IActionResult> CambiarContrasena([FromBody] CambiarContrasenaDTO dto)
+        {
+            var userId = int.Parse(User.FindFirst("idUsuario")!.Value);
+
+            var usuario = await _context.Usuarios.FindAsync(userId);
+
+            if (usuario == null)
+                return Unauthorized();
+
+            // Validar contraseña actual
+            if (usuario.ContrasenaHash != dto.ContrasenaActual)
+                return BadRequest("La contraseña actual es incorrecta.");
+
+            usuario.ContrasenaHash = dto.NuevaContrasena;
+            usuario.CambiarContrasena = false;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Contraseña cambiada correctamente." });
         }
     }
 }

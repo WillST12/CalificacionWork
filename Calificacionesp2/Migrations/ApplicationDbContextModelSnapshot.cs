@@ -288,6 +288,9 @@ namespace Calificacionesp2.Migrations
                     b.Property<bool>("Activo")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("CambiarContrasena")
+                        .HasColumnType("bit");
+
                     b.Property<string>("ContrasenaHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
