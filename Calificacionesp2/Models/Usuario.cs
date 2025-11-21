@@ -20,6 +20,9 @@ namespace Backend.API.Models
         public string? CodigoRecuperacion { get; set; }
         public DateTime? CodigoExpira { get; set; }
 
+        public string? CodigoRecuperacion { get; set; }
+        public DateTime? ExpiracionCodigo { get; set; }
+
         [Required]
         [ForeignKey("Rol")]   
         public int IdRol { get; set; }

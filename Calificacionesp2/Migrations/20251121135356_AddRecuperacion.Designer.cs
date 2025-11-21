@@ -4,6 +4,7 @@ using Backend.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Calificacionesp2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251121135356_AddRecuperacion")]
+    partial class AddRecuperacion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -291,12 +294,6 @@ namespace Calificacionesp2.Migrations
                     b.Property<bool>("CambiarContrasena")
                         .HasColumnType("bit");
 
-<<<<<<< HEAD
-                    b.Property<DateTime?>("CodigoExpira")
-                        .HasColumnType("datetime2");
-
-=======
->>>>>>> c4d14e2f75c5c16353ef0d633be3f73c96a118b8
                     b.Property<string>("CodigoRecuperacion")
                         .HasColumnType("nvarchar(max)");
 

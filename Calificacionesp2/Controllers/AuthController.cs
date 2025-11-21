@@ -96,6 +96,57 @@ namespace Backend.API.Controllers
         }
 
 
+        [HttpPost("solicitar-recuperacion")]
+        public async Task<IActionResult> SolicitarRecuperacion([FromBody] RecuperarPasswordDTO dto)
+        {
+            var usuario = await _context.Usuarios
+                .FirstOrDefaultAsync(u => u.NombreUsuario == dto.NombreUsuario);
+
+            if (usuario == null)
+                return BadRequest("El usuario no existe.");
+
+            // generar código de 6 dígitos
+            var codigo = new Random().Next(100000, 999999).ToString();
+
+            usuario.CodigoRecuperacion = codigo;
+            usuario.ExpiracionCodigo = DateTime.UtcNow.AddMinutes(10);
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "Código generado correctamente.",
+                usuario = usuario.NombreUsuario,
+                codigo // <-- tú lo ves en Swagger para dárselo al usuario
+            });
+        }
+
+        [HttpPost("restablecer-password")]
+        public async Task<IActionResult> RestablecerPassword([FromBody] RestablecerPasswordDTO dto)
+        {
+            var usuario = await _context.Usuarios
+                .FirstOrDefaultAsync(u =>
+                    u.NombreUsuario == dto.NombreUsuario &&
+                    u.CodigoRecuperacion == dto.Codigo
+                );
+
+            if (usuario == null)
+                return BadRequest("Código inválido.");
+
+            if (usuario.ExpiracionCodigo < DateTime.UtcNow)
+                return BadRequest("El código expiró.");
+
+            // Cambiar contraseña y limpiar código
+            usuario.ContrasenaHash = dto.NuevaContrasena;
+            usuario.CodigoRecuperacion = null;
+            usuario.ExpiracionCodigo = null;
+            usuario.CambiarContrasena = false;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Contraseña restablecida correctamente." });
+        }
+
 
         [HttpPost("cambiar-contrasena")]
         [Authorize]
