@@ -18,6 +18,9 @@ namespace Backend.API.Models
 
         public bool CambiarContrasena { get; set; } = true;
 
+        public string? CodigoRecuperacion { get; set; }
+        public DateTime? ExpiracionCodigo { get; set; }
+
         [Required]
         [ForeignKey("Rol")]   
         public int IdRol { get; set; }
