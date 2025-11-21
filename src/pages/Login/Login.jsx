@@ -16,46 +16,71 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      const response = await authService.login(form);
-  
+      const data = await authService.login(form);
 
-      login(response);
-      navigate("/dashboard");
-    } catch (err) {
-      console.error("❌ Error login:", err);
-      alert("Credenciales incorrectas o API no disponible.");
+      login({
+        token: data.token,
+        rol: data.rol,
+        debeCambiarContrasena: data.debeCambiarContrasena,
+        nombreUsuario: form.nombreUsuario,
+      });
+
+      navigate(data.debeCambiarContrasena ? "/cambiar-contrasena" : "/dashboard");
+
+    } catch (error) {
+      alert("Credenciales incorrectas. Verifica tu usuario o contraseña.");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 rounded shadow w-full max-w-md"
-      >
-        <h2 className="text-xl font-bold mb-4">Iniciar sesión</h2>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-200 flex items-center justify-center px-4">
+      <div className="bg-white shadow-lg rounded-2xl p-10 w-full max-w-md border border-blue-100">
+        
+        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
+          Calificiones LogicOne
+        </h2>
 
-        <input
-          name="nombreUsuario"
-          value={form.nombreUsuario}
-          onChange={handleChange}
-          placeholder="Usuario"
-          className="w-full p-2 mb-3 border rounded"
-        />
+        <form onSubmit={handleSubmit} className="space-y-4">
 
-        <input
-          name="contrasena"
-          type="password"
-          value={form.contrasena}
-          onChange={handleChange}
-          placeholder="Contraseña"
-          className="w-full p-2 mb-4 border rounded"
-        />
+          <div>
+            <label className="text-gray-600 font-medium">Usuario</label>
+            <input
+              name="nombreUsuario"
+              value={form.nombreUsuario}
+              onChange={handleChange}
+              placeholder="Ingresa tu usuario"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
 
-        <button className="w-full bg-blue-600 text-white py-2 rounded">
-          Entrar
-        </button>
-      </form>
+          <div>
+            <label className="text-gray-600 font-medium">Contraseña</label>
+            <input
+              name="contrasena"
+              type="password"
+              value={form.contrasena}
+              onChange={handleChange}
+              placeholder="••••••••"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <button className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold">
+            Iniciar Sesión
+          </button>
+
+        </form>
+
+        <div className="text-center mt-4">
+          <button
+            className="text-blue-600 hover:underline text-sm"
+            onClick={() => alert("Pronto implementamos recuperación de contraseña")}
+          >
+            ¿Olvidaste tu contraseña?
+          </button>
+        </div>
+
+      </div>
     </div>
   );
 }
